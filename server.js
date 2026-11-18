@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const studentRoutes = require('./routes/studentRoutes');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -16,6 +17,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'Student Management API is running' });
 });
+
+// Mount Student API Routes
+app.use('/api/students', studentRoutes);
 
 // Port configuration with fallback
 const PORT = process.env.PORT || 5000;
