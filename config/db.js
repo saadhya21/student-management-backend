@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const dns = require('node:dns');
 
 // Load environment variables
 dotenv.config();
 
 /**
  * Connects to MongoDB using Mongoose.
- * Validates MONGODB_URI and handles connection errors safely.
+ * Validates MONGODB_URI, configures DNS if specified, and handles connection errors safely.
  */
 const connectDB = async () => {
   const mongoURI = process.env.MONGODB_URI;
@@ -18,8 +19,16 @@ const connectDB = async () => {
     process.exit(1);
   }
 
+  // Configure custom DNS servers if provided in environment variables (resolves SRV lookup issues)
+  if (process.env.DNS_SERVERS) {
+    const servers = process.env.DNS_SERVERS.split(',').map((s) => s.trim()).filter(Boolean);
+    if (servers.length > 0) {
+      dns.setServers(servers);
+    }
+  }
+
   try {
-    // Attempt connection
+    // Attempt database connection
     await mongoose.connect(mongoURI);
     console.log('MongoDB Connected Successfully');
   } catch (error) {
