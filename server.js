@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const connectDB = require('./config/db');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -19,7 +20,20 @@ app.get('/', (req, res) => {
 // Port configuration with fallback
 const PORT = process.env.PORT || 5000;
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Connect to MongoDB and start the server
+const startServer = async () => {
+  try {
+    // Connect to database before starting the Express server
+    await connectDB();
+
+    // Start Express server after successful DB connection
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
